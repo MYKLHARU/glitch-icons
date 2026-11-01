@@ -1,0 +1,60 @@
+name: Deploy Glitch Icons to GitHub Pages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download the complete site source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release download --pattern 'Glitch-Icons-GitHub-Pages.zip' --dir "$RUNNER_TEMP/glitch-source"
+      - name: Extract site and configure repository links
+        env:
+          SITE_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, zipfile
+          from pathlib import Path
+          archive = Path(os.environ['RUNNER_TEMP']) / 'glitch-source' / 'Glitch-Icons-GitHub-Pages.zip'
+          root = Path('glitch-icons').resolve()
+          with zipfile.ZipFile(archive) as z:
+              for item in z.infolist():
+                  target = Path(item.filename).resolve()
+                  if not target.is_relative_to(root):
+                      raise ValueError('Unexpected archive path')
+              z.extractall('.')
+          docs = root / 'docs'
+          repo = os.environ['SITE_REPOSITORY']
+          (docs / 'config.js').write_text('window.GLITCH_CONFIG = '+json.dumps({'repository':repo})+';\n')
+          html = docs / 'index.html'
+          html.write_text(html.read_text().replace('mickyharu-dot/glitch-icons',repo).replace('MYKLHARU/glitch-icons',repo))
+          PY
+      - name: Validate every animation
+        run: python3 glitch-icons/tools/validate_pack.py
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: glitch-icons/docs
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
