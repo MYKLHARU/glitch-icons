@@ -67,8 +67,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none
           script: |
             python3 .github/workflows/verify-compat-install.py
-            cd tv && python3 verify_tv.py
-            cd tv && python3 verify_legacy_frames.py
+            cd tv && python3 verify_compatibility.py
       - name: Save verification screenshots and frame comparison
         if: always()
         uses: actions/upload-artifact@v4
