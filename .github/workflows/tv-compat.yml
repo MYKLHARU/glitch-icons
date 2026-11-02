@@ -1,0 +1,69 @@
+name: Verify older Shield compatibility
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tv:
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [21, 30]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install image comparison dependencies
+        run: python3 -m pip install --disable-pip-version-check Pillow numpy
+      - name: Restore compatibility source and exact original artwork
+        run: |
+          unzip -q Glitch-Reflections-TV-compatibility-source.zip -d tv
+          cd tv
+          python3 prepare_assets.py
+      - name: Download published TV version for old-Android comparison
+        if: matrix.api < 28
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release download v1.0.1 --pattern 'Glitch-Reflections-TV-2.0.1.apk' --dir apks
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build compatibility candidate with disposable test signature
+        working-directory: tv
+        env:
+          ANDROID_JAR: /usr/local/lib/android/sdk/platforms/android-35/android.jar
+          BUILD_TOOLS: /usr/local/lib/android/sdk/build-tools/35.0.0
+        run: |
+          bash build.sh
+          keytool -genkeypair -keystore build/test.jks -alias smoke-test -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Ephemeral emulator test only' -storepass android -keypass android
+          "$BUILD_TOOLS/apksigner" sign --ks build/test.jks --ks-pass pass:android --out build/test.apk build/Glitch-Reflections-TV-unsigned.apk
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify Android TV ${{ matrix.api }} navigation and original frame playback
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          disable-animations: false
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none
+          script: |
+            python3 .github/workflows/verify-compat-install.py
+            cd tv && python3 verify_tv.py
+            cd tv && python3 verify_legacy_frames.py
+      - name: Save verification screenshots and frame comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-TV-compatibility-API-${{ matrix.api }}
+          path: tv/verification
+          retention-days: 14
