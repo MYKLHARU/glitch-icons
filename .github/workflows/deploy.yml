@@ -19,6 +19,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out donation assets
+        uses: actions/checkout@v6
       - name: Download the complete site source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -30,7 +32,7 @@ jobs:
           SITE_BUILD: ${{ github.run_id }}
         run: |
           python3 - <<'PY'
-          import json, os, zipfile
+          import json, os, zipfile, shutil
           from pathlib import Path
           archive = Path(os.environ['RUNNER_TEMP']) / 'glitch-source' / 'Glitch-Icons-GitHub-Pages.zip'
           root = Path('glitch-icons').resolve()
@@ -52,7 +54,14 @@ jobs:
           content = content.replace('<div class="hero-actions">','<div class="hero-actions">'+apk_button)
           content = content.replace('<div class="download-actions">','<div class="download-actions">'+apk_button+'<span class="download-meta">Glitch-Reflections.apk · Android · ~217 MB</span>')
           content = content.replace('This download contains the icon artwork as APNG files. An APK is not included.','Yes. Download Glitch-Reflections.apk using the APK button above. The APNG icon ZIP is also available separately.')
-          for asset in ('style.css','config.js','catalog.js','app.js'):
+          support = Path('support.html').read_text()
+          assert content.count('<section class="faq wrap"') == 1, 'Cannot locate donation section insertion point'
+          content = content.replace('<section class="faq wrap"', support+'\n    <section class="faq wrap"', 1)
+          content = content.replace('<a class="repository-link"', '<a href="#support">Support</a><a class="repository-link"', 1)
+          shutil.copyfile('support-paypal.png', docs/'support-paypal.png')
+          with (docs/'style.css').open('a') as styles:
+              styles.write('\n'+Path('support.css').read_text())
+          for asset in ('style.css','config.js','catalog.js','app.js','support-paypal.png'):
               content = content.replace(chr(34)+asset+chr(34), chr(34)+asset+'?v='+os.environ['SITE_BUILD']+chr(34))
           html.write_text(content)
           PY
@@ -67,4 +76,5 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+
 
