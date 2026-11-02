@@ -27,6 +27,7 @@ jobs:
       - name: Extract site and configure repository links
         env:
           SITE_REPOSITORY: ${{ github.repository }}
+          SITE_BUILD: ${{ github.run_id }}
         run: |
           python3 - <<'PY'
           import json, os, zipfile
@@ -43,7 +44,10 @@ jobs:
           repo = os.environ['SITE_REPOSITORY']
           (docs / 'config.js').write_text('window.GLITCH_CONFIG = '+json.dumps({'repository':repo})+';\n')
           html = docs / 'index.html'
-          html.write_text(html.read_text().replace('mickyharu-dot/glitch-icons',repo).replace('MYKLHARU/glitch-icons',repo))
+          content = html.read_text().replace('mickyharu-dot/glitch-icons',repo).replace('MYKLHARU/glitch-icons',repo)
+          for asset in ('style.css','config.js','catalog.js','app.js'):
+              content = content.replace(chr(34)+asset+chr(34), chr(34)+asset+'?v='+os.environ['SITE_BUILD']+chr(34))
+          html.write_text(content)
           PY
       - name: Validate every animation
         run: python3 glitch-icons/tools/validate_pack.py
