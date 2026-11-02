@@ -13,7 +13,7 @@ Each transparent APNG is **320 × 180** pixels, retains its original `.png` file
 
 The responsive site includes a 20-icon preview in four rows of five, search across all 1,195 icons, enlarged previews, individual icon downloads, pagination and a pause control. Reduced-motion preferences start the gallery on still frames.
 
-The complete website source and assets are attached to each Release as `Glitch-Icons-GitHub-Pages.zip`. The workflow in this repository downloads the source, validates all 1,195 animations, then deploys it to GitHub Pages. To republish, use **Actions → Deploy Glitch Icons to GitHub Pages → Run workflow**, or publish an updated Release containing the source ZIP.
+The complete website source and assets are attached to each Release as `Glitch-Icons-GitHub-Pages.zip`. The workflow in this repository downloads the source, validates all 1,195 animations, then deploys it to GitHub Pages. To republish, use **Actions → Deploy Glitch Icons to GitHub Pages → Run workflow**. After publishing a new Release, run the workflow from the `main` branch.
 
 ## Using the icons
 
