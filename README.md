@@ -5,6 +5,7 @@
 Each transparent APNG is **320 × 180** pixels, retains its original `.png` filename and loops through six frames. The first five animation frames are preserved; frame 6 is an exact copy of frame 1 held for **two seconds**.
 
 - [Visit the Glitch Icons website](https://myklharu.github.io/glitch-icons/)
+- [Download Glitch-Reflections.apk](https://github.com/MYKLHARU/glitch-icons/releases/latest/download/Glitch-Reflections.apk)
 - [Download the complete icon pack](https://github.com/MYKLHARU/glitch-icons/releases/latest/download/Icons-glitch.zip)
 - [Download the complete website source](https://github.com/MYKLHARU/glitch-icons/releases/latest/download/Glitch-Icons-GitHub-Pages.zip)
 - [View releases](https://github.com/MYKLHARU/glitch-icons/releases)
@@ -17,7 +18,7 @@ The complete website source and assets are attached to each Release as `Glitch-I
 
 ## Using the icons
 
-Extract `Icons-glitch.zip` to get the `Icons/` folder. APNG is animated PNG, so the files keep the `.png` extension. Animation support depends on your app or launcher. An Android APK is not included.
+Extract `Icons-glitch.zip` to get the `Icons/` folder. APNG is animated PNG, so the files keep the `.png` extension. Animation support depends on your app or launcher. The Android icon-pack app is available as `Glitch-Reflections.apk`, with the same 1,195 updated animations.
 
 ## Source and validation
 
@@ -31,3 +32,4 @@ python3 tools/package_release.py
 The validation checks PNG CRCs, dimensions, frame counts, infinite looping, SHA-256 hashes and the exact two-second copy of frame 1.
 
 Names and logos belong to their respective owners. This collection is independent and is not affiliated with the brands shown.
+
