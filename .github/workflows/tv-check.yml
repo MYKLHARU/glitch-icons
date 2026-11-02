@@ -1,0 +1,54 @@
+name: Verify Android TV edition
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Restore TV app source and original artwork
+        run: |
+          unzip -q Glitch-Reflections-TV-source.zip -d tv
+          cd tv
+          python3 prepare_assets.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build the TV edition
+        working-directory: tv
+        env:
+          ANDROID_JAR: /usr/local/lib/android/sdk/platforms/android-35/android.jar
+          BUILD_TOOLS: /usr/local/lib/android/sdk/build-tools/35.0.0
+        run: |
+          bash build.sh
+          keytool -genkeypair -keystore build/test.jks -alias smoke-test -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Ephemeral emulator test only' -storepass android -keypass android
+          "$BUILD_TOOLS/apksigner" sign --ks build/test.jks --ks-pass pass:android --out build/test.apk build/Glitch-Reflections-TV-unsigned.apk
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Android TV remote and animation checks
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 28
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          disable-animations: false
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none
+          script: |
+            adb install -r tv/build/test.apk
+            cd tv && python3 verify_tv.py
+      - name: Save verification screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-TV-verification
+          path: tv/verification
+          if-no-files-found: warn
+          retention-days: 14
