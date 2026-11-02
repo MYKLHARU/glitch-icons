@@ -1,6 +1,12 @@
 name: Verify older Shield compatibility
 on:
   workflow_dispatch:
+    inputs:
+      android_api:
+        description: Android API to verify
+        type: choice
+        default: all
+        options: [all, '21', '26', '30']
 permissions:
   contents: read
 jobs:
@@ -8,15 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # The archived TV 21 image only ships a retired QEMU1 kernel.
-          # The maintained Google API 21 image has the supported ranchu kernel.
-          - api: 21
-            target: google_apis
-          - api: 26
-            target: android-tv
-          - api: 30
-            target: android-tv
+        # The archived TV 21 image only ships a retired QEMU1 kernel.
+        # The maintained Google API 21 image has the supported ranchu kernel.
+        include: ${{ fromJSON(inputs.android_api == 'all' && '[{"api":21,"target":"google_apis"},{"api":26,"target":"android-tv"},{"api":30,"target":"android-tv"}]' || inputs.android_api == '21' && '[{"api":21,"target":"google_apis"}]' || inputs.android_api == '26' && '[{"api":26,"target":"android-tv"}]' || '[{"api":30,"target":"android-tv"}]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

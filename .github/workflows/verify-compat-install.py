@@ -16,7 +16,8 @@ try:
     sdk=int(subprocess.check_output(['adb','shell','getprop','ro.build.version.sdk'],text=True).strip())
     if sdk<28:
         code,text=install('apks/Glitch-Reflections-TV-2.0.1.apk')
-        assert code!=0 and 'INSTALL_FAILED_OLDER_SDK' in text,text
+        # Pre-Android 7 adb can return exit code zero for a rejected installation.
+        assert 'INSTALL_FAILED_OLDER_SDK' in text,text
         checks.append('Published TV 2.0.1 fails with INSTALL_FAILED_OLDER_SDK on Android '+str(sdk))
     code,text=install('tv/build/test.apk')
     assert code==0 and 'Success' in text,text
