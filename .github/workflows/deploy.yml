@@ -45,6 +45,13 @@ jobs:
           (docs / 'config.js').write_text('window.GLITCH_CONFIG = '+json.dumps({'repository':repo})+';\n')
           html = docs / 'index.html'
           content = html.read_text().replace('mickyharu-dot/glitch-icons',repo).replace('MYKLHARU/glitch-icons',repo)
+          apk_url = 'https://github.com/'+repo+'/releases/latest/download/Glitch-Reflections.apk'
+          apk_button = '<a class="button primary apk-download" href="'+apk_url+'">Download APK <span aria-hidden="true">↓</span></a>'
+          content = content.replace('class="button primary pack-download"','class="text-link pack-download"')
+          content = content.replace('Download the pack','Download APNG ZIP').replace('Download Glitch Icons','Download icon ZIP')
+          content = content.replace('<div class="hero-actions">','<div class="hero-actions">'+apk_button)
+          content = content.replace('<div class="download-actions">','<div class="download-actions">'+apk_button+'<span class="download-meta">Glitch-Reflections.apk · Android · ~217 MB</span>')
+          content = content.replace('This download contains the icon artwork as APNG files. An APK is not included.','Yes. Download Glitch-Reflections.apk using the APK button above. The APNG icon ZIP is also available separately.')
           for asset in ('style.css','config.js','catalog.js','app.js'):
               content = content.replace(chr(34)+asset+chr(34), chr(34)+asset+'?v='+os.environ['SITE_BUILD']+chr(34))
           html.write_text(content)
@@ -60,3 +67,4 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+
