@@ -1,0 +1,46 @@
+name: Verify Shield Android 11 installation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download the exact published APKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release download v1.0.1 --pattern 'Glitch-Reflections-TV.apk' --pattern 'Glitch-Reflections-TV-2.0.1.apk' --dir apks
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          expected={'Glitch-Reflections-TV.apk':'44a91e49c99967ce6cb8d43de44fd64277d14fa3a660ed0f2a261630dc512db2','Glitch-Reflections-TV-2.0.1.apk':'c107d79c4ea84b1b4a8193847380634600cc24d6a316ddfadcf0ae4b017b9eb3'}
+          for name,sha in expected.items():
+              assert hashlib.file_digest((Path('apks')/name).open('rb'),'sha256').hexdigest()==sha,name
+          PY
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify fresh installation and upgrade on Android TV 11
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          disable-animations: false
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none
+          script: python3 .github/workflows/shield-install.py
+      - name: Save exact installation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shield-Android-11-installation
+          path: verification
+          retention-days: 14
