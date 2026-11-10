@@ -1,0 +1,40 @@
+{
+  "name": "MyAEW",
+  "icon_id": "ic_my_aew",
+  "resource": "animated_my_aew",
+  "category": "Sports",
+  "status": "Automatic",
+  "verified_platforms": [
+    "Android TV",
+    "Google TV"
+  ],
+  "package": "com.kiswe.androidtv.myaew",
+  "launch_activity": "com.kiswe.androidtvlive.ui.ContainerActivity",
+  "component": "ComponentInfo{com.kiswe.androidtv.myaew/com.kiswe.androidtvlive.ui.ContainerActivity}",
+  "play_store_url": "https://play.google.com/store/apps/details?id=com.kiswe.androidtv.myaew",
+  "manifest_evidence": {
+    "version_name": "2.5.14",
+    "version_code": 156,
+    "base_apk_sha256": "a14d9047c9f6fbe1d5addd77e519edf20b559ce6be45a0d47b5e6b95e54bca12",
+    "signer_sha256": "49bbe4a5e59dad8128758013b6fd3cdaf692e7e0ff472c7b98861bc1d68c805d",
+    "launcher_category": "android.intent.category.LEANBACK_LAUNCHER"
+  },
+  "artwork": {
+    "path": "icons/MY-AEW-Glitch.apng",
+    "sha256": "14439ed859cb799d1bfb63543a2cb6ce577fd1564350b850c265b91b69c9acf0",
+    "width": 320,
+    "height": 180,
+    "frames": 6,
+    "durations_ms": [
+      500,
+      110,
+      70,
+      100,
+      80,
+      2000
+    ],
+    "loop": 0,
+    "transparent": true
+  },
+  "other_platforms": "No unverified package names or activity aliases have been added."
+}

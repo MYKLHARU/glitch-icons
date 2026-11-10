@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item component="ComponentInfo{com.kiswe.androidtv.myaew/com.kiswe.androidtvlive.ui.ContainerActivity}" drawable="animated_my_aew" />
+</resources>
