@@ -1,0 +1,52 @@
+name: Upload a signed release asset
+run-name: Upload ${{ inputs.asset_name }} to ${{ inputs.release_tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      asset_url:
+        description: Direct HTTPS download URL for the finished file
+        required: true
+        type: string
+      asset_name:
+        description: Filename to publish
+        required: true
+        default: Glitch-Reflections-TV-2.0.3.apk
+        type: string
+      sha256:
+        description: Expected SHA-256 hash
+        required: true
+        type: string
+      release_tag:
+        description: Existing release tag
+        required: true
+        default: v1.0.1
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-upload-${{ inputs.release_tag }}-${{ inputs.asset_name }}
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ASSET_URL: ${{ inputs.asset_url }}
+      ASSET_NAME: ${{ inputs.asset_name }}
+      EXPECTED_SHA256: ${{ inputs.sha256 }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Download and verify the finished artifact
+        run: python3 .github/scripts/release_asset.py download
+      - name: Upload without overwriting existing release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 .github/scripts/release_asset.py publish
