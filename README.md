@@ -1,6 +1,6 @@
 # Glitch Icons
 
-## MyAEW source update — 2.0.3-tv
+## MyAEW Android TV update — 2.0.3-tv
 
 The Android TV source now contains **1,196 icons** and adds **MyAEW** under Sports with automatic matching. The existing 1,195 animations and 2,120 component mappings are preserved.
 
@@ -14,7 +14,9 @@ The Android TV source now contains **1,196 icons** and adds **MyAEW** under Spor
 
 The launcher component was read from MyAEW 2.5.14 (156)'s signed Android manifest. Both appfilter XML files, the searchable catalogue, picker resources, provider alias and thumbnail include the new icon. No unrelated app mappings are replaced.
 
-**Release status:** this is the source update. The published TV APK is still 2.0.2 with 1,195 icons; publishing 2.0.3 requires signing with the existing private TV release key. The website and older release ZIPs retain their published contents.
+**Released:** [Download Glitch-Reflections-TV-2.0.3.apk](https://github.com/MYKLHARU/glitch-icons/releases/download/v1.0.1/Glitch-Reflections-TV-2.0.3.apk). It is signed with the existing TV release key and can update TV 2.0.0–2.0.2. The website and older release ZIPs retain their published contents.
+
+Future release uploads are available through [Actions → Upload a signed release asset](.github/workflows/release-upload.yml). See [RELEASE_UPLOADS.md](RELEASE_UPLOADS.md) for inputs and verification.
 
 ![MyAEW animation](icons/MY-AEW-Glitch.apng)
 
