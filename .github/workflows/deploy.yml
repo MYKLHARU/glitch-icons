@@ -65,8 +65,15 @@ jobs:
               content = content.replace(chr(34)+asset+chr(34), chr(34)+asset+'?v='+os.environ['SITE_BUILD']+chr(34))
           html.write_text(content)
           PY
+      - name: Apply current icons, download links and sorting
+        env:
+          SITE_REPOSITORY: ${{ github.repository }}
+          SITE_BUILD: ${{ github.run_id }}
+        run: python3 website/build.py glitch-icons
       - name: Validate every animation
         run: python3 glitch-icons/tools/validate_pack.py
+      - name: Package the complete updated icon ZIP for the website
+        run: python3 glitch-icons/tools/package_release.py glitch-icons/docs/downloads
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
@@ -76,5 +83,6 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+
 
 

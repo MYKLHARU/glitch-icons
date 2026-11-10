@@ -1,0 +1,13 @@
+{
+  "apkAsset": "Glitch-Reflections-TV-2.0.3.apk",
+  "packAsset": "Icons-glitch-2.0.3.zip",
+  "icons": [
+    {
+      "file": "MY-AEW-Glitch.apng",
+      "name": "MyAEW",
+      "addedAt": "2026-11-10",
+      "source": "icons/MY-AEW-Glitch.apng",
+      "still": "icons/MY-AEW-preview.png"
+    }
+  ]
+}
